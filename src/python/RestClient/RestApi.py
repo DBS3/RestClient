@@ -2,7 +2,7 @@ from RestClient.RequestHandling.HTTPRequest import HTTPRequest
 
 import pycurl
 
-class RestClient(object):
+class RestApi(object):
     def __init__(self, auth=None):
         self._curl = pycurl.Curl()
         
