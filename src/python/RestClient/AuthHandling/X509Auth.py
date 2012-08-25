@@ -9,6 +9,19 @@ class X509Auth(object):
         self._ssl_cert = ssl_cert
         self._ssl_key = ssl_key
 
+        if not (self._ssl_cert and self._ssl_key):
+            self.__search_cert_key()
+
+        if not self._ca_path:
+            self.__search_ca_path()
+
+        #Check if ssl_cert, ssl_key and ca_path do exist
+        if not (os.path.isfile(self._ssl_key) and os.path.isfile(self._ssl_cert)):
+            raise ClientAuthException("key or cert file does not exist: %s, %s" % (self._ssl_key,self._ssl_cert))
+
+        if not (os.path.isdir(self._ca_path)):
+            raise ClientAuthException("CA path does not exist: %s" % (self._ca_path))
+
     def __search_ca_path(self):
         """
         Get CA Path to check the validity of the server host certificate on the client side
@@ -69,19 +82,6 @@ class X509Auth(object):
             raise ClientAuthException("No valid X509 cert-key-pair found.")
 
     def configure_auth(self, curl_object):
-        if not (self._ssl_cert and self._ssl_key):
-            self.__search_cert_key()
-
-        if not self._ca_path:
-            self.__search_ca_path()
-
-        #Check if ssl_cert, ssl_key and ca_path do exist
-        if not (os.path.isfile(self._ssl_key) and os.path.isfile(self._ssl_cert)):
-            raise ClientAuthException("key or cert file does not exist: %s, %s" % (self._ssl_key,self._ssl_cert))
-
-        if not (os.path.isdir(self._ca_path)):
-            raise ClientAuthException("CA path does not exist: %s" % (self._ca_path))
-
         curl_object.setopt(curl_object.CAPATH, self._ca_path)
         curl_object.setopt(curl_object.SSLCERT, self._ssl_cert)
         curl_object.setopt(curl_object.SSLKEY, self._ssl_key)
