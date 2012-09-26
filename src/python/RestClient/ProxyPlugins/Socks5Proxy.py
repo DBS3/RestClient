@@ -1,10 +1,14 @@
+from urlparse import urlparse
+
 class Socks5Proxy(object):
-    """Socks5 Proxy Plugin for pycurl"""
-    def __init__(self, proxy_hostname, proxy_port, proxy_user=None, proxy_passwd=None):
-        self._proxy_hostname = proxy_hostname
-        self._proxy_port = proxy_port
-        self._proxy_user = proxy_user
-        self._proxy_passwd = proxy_passwd
+    """Socks5 Proxy Plugin for pycurl
+    proxy_url format socks5://username:passwd@hostname:port"""
+    def __init__(self, proxy_url):
+        parsed_url = urlparse(proxy_url)
+        self._proxy_hostname = parsed_url.hostname
+        self._proxy_port = parsed_url.port
+        self._proxy_user = parsed_url.username
+        self._proxy_passwd = parsed_url.password
 
     def configure_proxy(self, curl_object):
         """configure pycurl proxy settings"""
