@@ -14,6 +14,7 @@ systems = \
                    'RestClient.RestApi'],
     'pythonpkg': ['RestClient.AuthHandling',
                   'RestClient.ErrorHandling',
+                  'RestClient.ProxyPlugins',
                   'RestClient.RequestHandling']
   }
 }
