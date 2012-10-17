@@ -71,6 +71,10 @@ class BuildCommand(Command):
     shutil.rmtree("%s/build" % get_relative_path(), True)
     shutil.rmtree("doc/build", True)
 
+  def generate_docs(self):
+    os.environ["PYTHONPATH"] = "%s/build/lib:%s" % (os.getcwd(), os.environ["PYTHONPATH"])
+    spawn(['make', '-C', 'doc', 'html', 'PROJECT=RestClient'])
+
   def run(self):
     command = 'build'
     if self.distribution.have_run.get(command): return
@@ -78,6 +82,7 @@ class BuildCommand(Command):
     cmd.force = self.force
     cmd.ensure_finalized()
     cmd.run()
+    self.generate_docs()
     self.distribution.have_run[command] = 1
 
 class InstallCommand(install):
