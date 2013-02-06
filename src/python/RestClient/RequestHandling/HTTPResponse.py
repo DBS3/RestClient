@@ -12,7 +12,9 @@ class HTTPResponse(object):
         self._header_dict = {}
         for header in self._response_header.getvalue().split('\r\n'):
             if header.startswith('HTTP'):
-                self._version, self._code, self._msg = header.split(' ', 2)
+                initial_header = header.split(' ', 2)
+                self._version, self._code = initial_header[0:2]
+                self._msg = initial_header[2] if len(initial_header) > 2 else ''
             elif header != "":
                 self._header_dict.update(dict([header.split(':',1)]))
 
@@ -32,7 +34,7 @@ class HTTPResponse(object):
     def raw_header(self):
         """Returns raw response header received from server"""
         return self._response_header.getvalue()
-    
+
     @property
     def header(self):
         """Returns header dictionary created by parsing raw response header from server"""
