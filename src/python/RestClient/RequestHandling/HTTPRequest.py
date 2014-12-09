@@ -44,6 +44,10 @@ class HTTPRequest(object):
             ### set content-length header to ensure performant cherrypy reads
             request_headers['Content-Length'] = str(content_length)
 
+        elif method == 'DELETE':
+            ### set content-length header to avoid "empty relply from server error" from cherrypy
+            request_headers['Content-Length'] = 0
+
         self._curl_options[pycurl.HTTPHEADER] = ["%s: %s" % (key, value) for key, value in request_headers.iteritems()]
 
     def __call__(self, curl_object):
