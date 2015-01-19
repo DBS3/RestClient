@@ -1,7 +1,9 @@
 from getpass import getpass
 from RestClient.ErrorHandling.RestClientExceptions import ClientAuthException
 
-import os, sys
+import os
+import pycurl
+import sys
 
 class X509Auth(object):
     def __init__(self, ca_path=None, ssl_cert=None, ssl_key=None, ssl_verifypeer=True):
@@ -82,14 +84,17 @@ class X509Auth(object):
         else:
             raise ClientAuthException("No valid X509 cert-key-pair found.")
 
-    def configure_auth(self, curl_object):
-        curl_object.setopt(curl_object.SSL_VERIFYPEER, self._ssl_verifypeer)
-        curl_object.setopt(curl_object.CAPATH, self._ca_path)
-        curl_object.setopt(curl_object.SSLCERT, self._ssl_cert)
-        curl_object.setopt(curl_object.SSLKEY, self._ssl_key)
+    def configure_auth(self):
+        configuration = {pycurl.SSL_VERIFYPEER: self._ssl_verifypeer,
+                         pycurl.CAPATH: self._ca_path,
+                         pycurl.SSLCERT: self._ssl_cert,
+                         pycurl.SSLKEY: self._ssl_key
+                        }
 
         if self.ssl_key_pass:
-            curl_object.setopt(curl_object.SSLKEYPASSWD, self.ssl_key_pass)
+            configuration[pycurl.SSLKEYPASSWD] = self.ssl_key_pass
+
+        return configuration
 
     @property
     def ssl_key_pass(self):

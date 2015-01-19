@@ -10,14 +10,14 @@ except ImportError:
     import StringIO
 
 class HTTPRequest(object):
-    supported_methods = {'GET'    : {pycurl.HTTPGET : True},
-                         'POST'   : {pycurl.POST : True},
-                         'PUT'    : {pycurl.UPLOAD : True},#pycurl.PUT has been deprecated
-                         'DELETE' : {pycurl.CUSTOMREQUEST : 'DELETE'}}
+    supported_methods = {'GET'    : {pycurl.HTTPGET: True},
+                         'POST'   : {pycurl.POST: True},
+                         'PUT'    : {pycurl.UPLOAD: True},#pycurl.PUT has been deprecated
+                         'DELETE' : {pycurl.CUSTOMREQUEST: 'DELETE'}}
 
-    def __init__(self, method, url, api, params, data, request_headers={}, additional_curl_options={}):
+    def __init__(self, method, url, api, params, data, request_headers={}, curl_options={}):
         method = method.upper()
-        self._curl_options = dict(additional_curl_options) ### copy dict since mutables are shared between instances
+        self._curl_options = dict(curl_options) ### copy dict since mutables are shared between instances
         request_headers = dict(request_headers) ### copy dict since mutables are shared between instances
 
         try:
@@ -51,6 +51,10 @@ class HTTPRequest(object):
         self._curl_options[pycurl.HTTPHEADER] = ["%s: %s" % (key, value) for key, value in request_headers.iteritems()]
 
     def __call__(self, curl_object):
+        #Reset all options set on curl handle to default values,
+        #but preserve live connections, session ID cache, DNS cache, cookies, and shares.
+        curl_object.reset()
+
         for key, value in self._curl_options.iteritems():
             curl_object.setopt(key, value)
 
