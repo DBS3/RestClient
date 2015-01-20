@@ -1,6 +1,7 @@
 from getpass import getpass
 from RestClient.ErrorHandling.RestClientExceptions import ClientAuthException
 
+import pycurl
 import sys
 
 class BasicAuth(object):
@@ -17,9 +18,9 @@ class BasicAuth(object):
         if not (self._username and self._password):
             raise ClientAuthException("No valid user or password specified for BasicAuth")
 
-    def configure_auth(self, curl_object):
-        curl_object.setopt(curl_object.HTTPAUTH, curl_object.HTTPAUTH_BASIC)
-        curl_object.setopt(curl_object.USERPWD, ("%s:%s") % (self.userpwd))
+    def configure_auth(self):
+        return {pycurl.HTTPAUTH: pycurl.HTTPAUTH_BASIC,
+                pycurl.USERPWD: "%s:%s" % self.userpwd}
 
     @property
     def userpwd(self):
