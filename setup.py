@@ -53,7 +53,7 @@ class BuildCommand(Command):
   user_options.append(('system=', 's', 'build the specified system'))
 
   def initialize_options(self):
-    self.system = None
+    self.system = 'RestClient'
 
   def finalize_options(self):
     # Check options.
@@ -97,7 +97,7 @@ class InstallCommand(install):
 
   def initialize_options(self):
     install.initialize_options(self)
-    self.system = None
+    self.system = 'RestClient'
     self.patch = None
 
   def finalize_options(self):
@@ -141,6 +141,13 @@ class InstallCommand(install):
 
       self.run_command(cmd_name)
       self.distribution.have_run[cmd_name] = 1
+
+#By default setuptools calls python setup.py build for dependencies. If another package depends on RestClient,
+# setuptools will fail to install RestClient. So rewrite build and install parameter to build_system and install_system
+for index, option in enumerate(sys.argv):
+    if option in ('build', 'install'):
+        sys.argv[index] += '_system'
+
 
 setup(name = 'RestClient',
       version = '0.1',
